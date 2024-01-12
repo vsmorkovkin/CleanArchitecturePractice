@@ -12,10 +12,22 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    // initialize when instances are needed (first call)
-    private val userRepository by lazy {  UserRepositoryImpl(context = applicationContext) }
-    private val getUserNameUseCase by lazy { GetUserNameUseCase(userRepository = userRepository) }
-    private val saveUserNameUseCase by lazy { SaveUserNameUseCase(userRepository = userRepository) }
+    // by lazy - initialize when instances are needed (first call)
+    private val userRepository by lazy(LazyThreadSafetyMode.NONE) {
+        UserRepositoryImpl(context = applicationContext)
+    }
+
+    private val getUserNameUseCase by lazy(LazyThreadSafetyMode.NONE) {
+        GetUserNameUseCase(
+            userRepository = userRepository
+        )
+    }
+
+    private val saveUserNameUseCase by lazy(LazyThreadSafetyMode.NONE) {
+        SaveUserNameUseCase(
+            userRepository = userRepository
+        )
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -27,14 +39,16 @@ class MainActivity : AppCompatActivity() {
         binding.sendButton.setOnClickListener {
             val text = binding.dataEditText.text.toString() // get text from editText
             val params = SaveUserNameParam(name = text) // create params for usercase.execute()
-            val result = saveUserNameUseCase.execute(param = params) // execute usercase and save result
+            val result =
+                saveUserNameUseCase.execute(param = params) // execute usercase and save result
             binding.dataTextView.text = "Save result = $result" // print result in textView
         }
 
         // set get data button onCling
         binding.receiveDataButton.setOnClickListener {
             val userName = getUserNameUseCase.execute()
-            binding.dataTextView.text = "${userName.firstName} ${userName.lastName}" // print userName in textView
+            binding.dataTextView.text =
+                "${userName.firstName} ${userName.lastName}" // print userName in textView
         }
     }
 }
