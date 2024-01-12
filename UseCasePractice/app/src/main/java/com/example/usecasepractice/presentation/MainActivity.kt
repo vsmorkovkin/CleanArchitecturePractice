@@ -2,6 +2,7 @@ package com.example.usecasepractice.presentation
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import com.example.usecasepractice.data.repository.UserRepositoryImpl
 import com.example.usecasepractice.databinding.ActivityMainBinding
 import com.example.usecasepractice.domain.models.SaveUserNameParam
 import com.example.usecasepractice.domain.usercase.GetUserNameUseCase
@@ -11,8 +12,10 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private val getUserNameUseCase = GetUserNameUseCase()
-    private val saveUserNameUseCase = SaveUserNameUseCase()
+    // initialize when instances are needed (first call)
+    private val userRepository by lazy {  UserRepositoryImpl(context = applicationContext) }
+    private val getUserNameUseCase by lazy { GetUserNameUseCase(userRepository = userRepository) }
+    private val saveUserNameUseCase by lazy { SaveUserNameUseCase(userRepository = userRepository) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
