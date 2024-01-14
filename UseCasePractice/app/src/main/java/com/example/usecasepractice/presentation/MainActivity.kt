@@ -1,8 +1,9 @@
 package com.example.usecasepractice.presentation
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 import com.example.usecasepractice.data.repository.UserRepositoryImpl
+import com.example.usecasepractice.data.storage.sharedprefs.SharedPrefsUserStorage
 import com.example.usecasepractice.databinding.ActivityMainBinding
 import com.example.usecasepractice.domain.models.SaveUserNameParam
 import com.example.usecasepractice.domain.usercase.GetUserNameUseCase
@@ -14,7 +15,7 @@ class MainActivity : AppCompatActivity() {
 
     // by lazy - initialize when instances are needed (first call)
     private val userRepository by lazy(LazyThreadSafetyMode.NONE) {
-        UserRepositoryImpl(context = applicationContext)
+        UserRepositoryImpl(SharedPrefsUserStorage(applicationContext))
     }
 
     private val getUserNameUseCase by lazy(LazyThreadSafetyMode.NONE) {

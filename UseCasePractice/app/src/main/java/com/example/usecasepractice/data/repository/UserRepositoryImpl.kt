@@ -1,36 +1,37 @@
 package com.example.usecasepractice.data.repository
 
-import android.content.Context
+import com.example.usecasepractice.data.storage.UserStorage
+import com.example.usecasepractice.data.storage.models.User
 import com.example.usecasepractice.domain.models.SaveUserNameParam
 import com.example.usecasepractice.domain.models.UserName
 import com.example.usecasepractice.domain.repository.UserRepository
 
-private const val SHARED_PREFS_NAME = "SHARED_PREFS_NAME"
-private const val KEY_FIRST_NAME = "firstName"
-private const val KEY_LAST_NAME = "lastName"
-private const val DEFAULT_FIRST_NAME = "Default first name"
-private const val DEFAULT_LAST_NAME = "Default last name"
 
-class UserRepositoryImpl(context: Context) : UserRepository {
-
-    private val sharedPreferences =
-        context.getSharedPreferences(SHARED_PREFS_NAME, Context.MODE_PRIVATE)
+class UserRepositoryImpl(private val userStorage: UserStorage) : UserRepository {
 
     override fun saveName(saveParam: SaveUserNameParam): Boolean {
-        sharedPreferences
-            .edit()
-            .putString(KEY_FIRST_NAME, saveParam.name)
-            .apply()
+        val user = mapToStorage(saveParam)
 
-        return true
+        return userStorage.save(user)
     }
 
     override fun getName(): UserName {
-        val firstName =
-            sharedPreferences.getString(KEY_FIRST_NAME, DEFAULT_FIRST_NAME) ?: DEFAULT_FIRST_NAME
-        val lastName =
-            sharedPreferences.getString(KEY_LAST_NAME, DEFAULT_LAST_NAME) ?: DEFAULT_LAST_NAME
+        val user = userStorage.get()
 
-        return UserName(firstName = firstName, lastName = lastName)
+        return mapToDomain(user)
+    }
+
+    private fun mapToStorage(saveParam: SaveUserNameParam): User {
+        return User(
+            firstName = saveParam.name,
+            lastName = "some_last_name"
+        )
+    }
+
+    private fun mapToDomain(user: User): UserName {
+        return UserName(
+            firstName = user.firstName,
+            lastName = user.lastName
+        )
     }
 }
