@@ -4,9 +4,9 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import com.example.cleanarchitecturepractice.data.repository.UserRepositoryImpl
 import com.example.cleanarchitecturepractice.data.storage.sharedprefs.SharedPrefsUserStorage
+import com.example.cleanarchitecturepractice.databinding.ActivityMainBinding
 import com.example.cleanarchitecturepractice.domain.usercase.GetUserNameUseCase
 import com.example.cleanarchitecturepractice.domain.usercase.SaveUserNameUseCase
-import com.example.usecasepractice.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
 
