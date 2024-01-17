@@ -1,29 +1,16 @@
 package com.example.cleanarchitecturepractice.presentation
 
 import android.os.Bundle
+import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import com.example.cleanarchitecturepractice.data.repository.UserRepositoryImpl
-import com.example.cleanarchitecturepractice.data.storage.sharedprefs.SharedPrefsUserStorage
+import androidx.lifecycle.ViewModelProvider
 import com.example.cleanarchitecturepractice.databinding.ActivityMainBinding
-import com.example.cleanarchitecturepractice.domain.usercase.GetUserNameUseCase
-import com.example.cleanarchitecturepractice.domain.usercase.SaveUserNameUseCase
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    // by lazy - initialize when instances are needed (first call)
-    private val userRepository by lazy(LazyThreadSafetyMode.NONE) {
-        UserRepositoryImpl(SharedPrefsUserStorage(applicationContext))
-    }
-
-    private val getUserNameUseCase by lazy(LazyThreadSafetyMode.NONE) {
-        GetUserNameUseCase(userRepository = userRepository)
-    }
-
-    private val saveUserNameUseCase by lazy(LazyThreadSafetyMode.NONE) {
-        SaveUserNameUseCase(userRepository = userRepository)
-    }
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -31,21 +18,41 @@ class MainActivity : AppCompatActivity() {
         val view = binding.root
         setContentView(view)
 
-        // set save data button onClick
+        Log.e("MainActivity", "Activity created")
+
+        viewModel = ViewModelProvider(this, MainViewModelFactory(applicationContext))
+            .get(MainViewModel::class.java)
+
+        viewModel.resultLive.observe(this) { text ->
+            binding.dataTextView.text = text
+        }
+
+        // set SaveDataButton onClick
         binding.sendButton.setOnClickListener {
-            val text = binding.dataEditText.text.toString() // get text from editText
-            val params =
-                com.example.cleanarchitecturepractice.domain.models.SaveUserNameParam(name = text) // create params for usercase.execute()
-            val result =
-                saveUserNameUseCase.execute(param = params) // execute usercase and save result
-            binding.dataTextView.text = "Save result = $result" // print result in textView
+            val userName = binding.dataEditText.text.toString()
+            viewModel.save(userName)
         }
 
         // set get data button onCling
         binding.receiveDataButton.setOnClickListener {
-            val userName = getUserNameUseCase.execute()
-            binding.dataTextView.text =
-                "${userName.firstName} ${userName.lastName}" // print userName in textView
+            viewModel.load()
         }
+    }
+
+    override fun onPause() {
+        Log.e("MainActivity", "Activity paused")
+        super.onPause()
+    }
+
+    override fun onStop() {
+        Log.e("MainActivity", "Activity stopped")
+        super.onStop()
+    }
+
+    override fun onDestroy() {
+        Log.e("MainActivity", "Activity destroyed")
+        super.onDestroy()
+
+
     }
 }
