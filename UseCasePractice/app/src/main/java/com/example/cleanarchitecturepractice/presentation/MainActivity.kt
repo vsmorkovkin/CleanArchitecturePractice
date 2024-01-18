@@ -3,14 +3,15 @@ package com.example.cleanarchitecturepractice.presentation
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProvider
 import com.example.cleanarchitecturepractice.databinding.ActivityMainBinding
+import org.koin.androidx.viewmodel.ext.android.viewModel
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
 
-    private lateinit var viewModel: MainViewModel
+    // use Koin extension function for creating ViewModel. Invocation will find rule for creating ViewModel in Koin modules
+    private val viewModel by viewModel<MainViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,9 +20,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(view)
 
         Log.e("MainActivity", "Activity created")
-
-        viewModel = ViewModelProvider(this, MainViewModelFactory(applicationContext))
-            .get(MainViewModel::class.java)
 
         viewModel.resultLive.observe(this) { text ->
             binding.dataTextView.text = text
@@ -52,7 +50,5 @@ class MainActivity : AppCompatActivity() {
     override fun onDestroy() {
         Log.e("MainActivity", "Activity destroyed")
         super.onDestroy()
-
-
     }
 }
